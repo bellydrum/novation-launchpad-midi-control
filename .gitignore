@@ -1,0 +1,14 @@
+# editor and system files
+**/.idea/*
+**/.DS_Store
+
+# controller dirs
+Behringer*/*
+Mackie*/*
+Novation Launch Control*/*
+Novation Launchpad*/*
+
+# other
+classes/*
+bkp_*
+TestScriptFolder/*
