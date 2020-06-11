@@ -35,6 +35,8 @@ class NovationLaunchpadHandler():
     button_map = 0
     mode_change_unlocked = False
 
+    pad_states = [[False for i in range(1, 9)] for j in range(1, 9)]
+
     """
     Initialization
     """
@@ -107,36 +109,65 @@ class NovationLaunchpadHandler():
     Input handlers
     """
 
-    def handle_pad_press(self, event, pad):
+    def handle_pad_press(self, event, pad, row, col, state):
         """ Put pad press code here.
         """
-        # print(f"Pressed pad {pad.number}.")
+        print(f'Pressed pad in row {row} and col {col} -- {state}')
 
-        if self.button_map == 0:  # DEFAULT MODE
+        if self.button_map == 0:
             """ Default button mapping events go here. """
 
-        elif self.button_map == 1:  # UI MODE
+        elif self.button_map == 1:
             """ UI button mapping events go here. """
 
-        elif self.button_map == 2:  # TRANSPORT MODE
+        elif self.button_map == 2:
             """ Transport button mapping events go here. """
 
-        print("hey hehehe")
-
         event.handled = True
 
-    def handle_pad_release(self, event):
+    def handle_pad_release(self, event, pad, row, col, state):
         """ Put pad release code here.
         """
+        # print(f'Released pad in row {row} and col {col} -- {state}.')
+
+        if self.button_map == 0:
+            """ Default button mapping events go here. """
+
+        elif self.button_map == 1:
+            """ UI button mapping events go here. """
+
+        elif self.button_map == 2:
+            """ Transport button mapping events go here. """
 
         event.handled = True
 
-    def control_change(self, event):
-        """ Put control change code here.
+    def handle_top_button_press(self, event, button):
+        """ Handle top row button presses here.
         """
+        print(f'Pressed top button {button}.')
 
         event.handled = True
 
+    def handle_top_button_release(self, event, button):
+        """ Handle top row button release here.
+        """
+        # print(f'Released top button {button}.')
+
+        event.handled = True
+
+    def handle_side_button_press(self, event, button):
+        """ Handle side column button presses here.
+        """
+        print(f'Pressed side button {button}.')
+
+        event.handled = True
+
+    def handle_side_button_release(self, event, button):
+        """ Handle side column button releases here.
+        """
+        # print(f'Released side button {button}.')
+
+        event.handled = True
 
     """
     Other event handlers

@@ -6,6 +6,9 @@ HEY! YOU!
  For all event handling, check next door in NovationLaunchpadHandler.py
 """
 
+import device
+import midi
+
 from NovationLaunchpadHandler import NovationLaunchpadHandler
 
 class DeviceInstance(NovationLaunchpadHandler):
@@ -17,8 +20,8 @@ class DeviceInstance(NovationLaunchpadHandler):
         print(f"Initialized Novation Launchpad on port {self.port}.")
 
     def OnMidiMsg(self, event):
-        event.handled = False
         self.delegate_event(event)
+        event.handled = False
 
     def OnDeInit(self):
         pass
@@ -39,39 +42,23 @@ class DeviceInstance(NovationLaunchpadHandler):
         self.handle_beat(value)
 
     def delegate_event(self, event):
-        status = event.status
-        try:
-            if self.events[status] == "Note On":
-                self.delegate_note_on(event)
-            elif self.events[status] == "Control Change":
-                self.delegate_control_change(event)
-            else:
-                print(f"Event status {status} not found in self.events.")
-                event.handled = True
-        except KeyError:
-            print(f"self.delegate_event error:\n  Event status {status} does not exist.")
+        if event.status == midi.MIDI_NOTEON:
+            row = int(str(event.data1)[0])
+            col = int(str(event.data1)[1])
 
-    def delegate_note_on(self, event):
-        # pad = self.get_pad(event.controlNum)
-        # if pad:
-        #     time_pressed = self.get_timestamp()
-        #     if self.check_buffer(pad, time_pressed):
-        #         self.last_pad_press_time = time_pressed
-        #         pad.on = not pad.on
-        #         pad.held = True
-        #         self.check_for_remap(pad, event)
-        #         self.handle_pad_press(event, pad)
-        event.handled = True
+            if col < 9:  # 64 pads
+                if event.data2 == 127:
+                    self.pad_states[row - 1][col - 1] = not self.pad_states[row - 1][col - 1]
+                    self.handle_pad_press(event, event.data1, row, col, self.pad_states[row - 1][col - 1])
+                elif event.data2 == 0: self.handle_pad_release(event, event.data1, row, col, self.pad_states[row - 1][col - 1])
+            else:  # 8 side buttons
+                if event.data2 == 127: self.handle_side_button_press(event, row)
+                elif event.data2 == 0: self.handle_side_button_release(event, row)
 
-    def delegate_note_off(self, event):
-        # pad = self.get_pad(event.controlNum)
-        # if pad:
-        #     pad.held = False
-        #     self.handle_pad_release(event, pad)
-        event.handled = True
-
-    def delegate_control_change(self, event):
-        pass
+        elif event.status == midi.MIDI_CONTROLCHANGE:
+            # 8 top buttons
+            if event.data2 == 127: self.handle_top_button_press(event, event.data1 - 103)
+            elif event.data2 == 0: self.handle_top_button_release(event, event.data1 - 103)
 
 mpd_device = DeviceInstance()
 
